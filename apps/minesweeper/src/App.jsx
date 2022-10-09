@@ -1,21 +1,17 @@
 import React from "react";
 import styled from "styled-components";
 import { isTriggered } from "@felvin-search/core";
-
+import { Game, GameProvider } from "./components";
 //------------Styled Components-------------
 // If you're unfamiliar with styled components
 // start here https://styled-components.com/docs/basics#getting-started
 
 const Container = styled.div`
-  background: black;
-  color: #bbbbbb;
+  display: flex;
   justify-content: center;
   align-items: center;
-  padding: 2rem;
-  .pre {
-    font-family: Courier New,Courier,Lucida Sans Typewriter,Lucida Typewriter,monospace;
-    font-size: 70%
-  }
+  text-align: center;
+  margin-bottom: 2rem;
 `;
 
 //=========================================
@@ -23,36 +19,30 @@ const Container = styled.div`
 // Your UI logic goes here.
 // `data` prop is exactly what is returned by queryToData.
 function Component({ data }) {
-  console.log(data)
-  const markup = {"__html": data["html"]}
   return (
-    <Container dangerouslySetInnerHTML={markup}>
-
+    <Container>
+      <GameProvider>
+        <Game />
+      </GameProvider>
     </Container>
   );
-}
-
-const getSnippet = async (query) => {
-  const response = await fetch(`https://cheat-sh.felvin.com/${query}`);
-  if(response.ok){
-    const data = await response.text()
-    return data;
-  } else {
-    return;
-  }
-
 }
 
 //=========================================
 
 // This where you can process the query and try to convert it into some meaningful data.
 const queryToData = async ({ query }) => {
-  const html = await getSnippet(query)
-  if(!html.includes("Unknown topic") && !html.includes("404 NOT FOUND")){
-    return {html};
-  } else {
+  if (!isTriggered(query, ["minesweeper","play minesweeper"])) {
     return;
   }
-}
+
+  // You can do any external API call or use any library here
+  // to convert the search query into some meaningful data.
+  // The data gets passed to the UI Component defined above.
+
+  const data = query.toUpperCase();
+
+  return data;
+};
 
 export { queryToData, Component };
